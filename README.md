@@ -63,8 +63,8 @@
 ### 1. Clone o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/eventify.git
-cd eventify
+git clone https://github.com/Djosekispy/Eventify.git
+cd Eventify
 ```
 
 ### 2. Instale as Dependências
