@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Event;
+use Illuminate\Support\Facades\DB;
 
 class EventObserver
 {

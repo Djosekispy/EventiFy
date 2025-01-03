@@ -39,9 +39,11 @@
                 @if (isset($event['ticket_name']))
                 <ul>
                     @foreach ($event['ticket_name'] as $index => $ticket )
+                    @if(!empty($ticket))
                     <li>
                         <p style="gap: 4px;"><b > {{$ticket}}  - </b> <i>{{$event['ticket_price'][$index]}} kz</i></p>
                     </li>
+                    @endif
                     @endforeach
                 </ul>
                 @endif
@@ -96,59 +98,58 @@
             @endforeach
             <input type="hidden" name="event_type" value="{{$event['event_type']}}">
             <input type="hidden" name="category" value="{{$event['category']}}">
-            <input type="hidden" name="payment_info" value=" {{$event['payment_info']}}">
+            <input type="hidden" name="payment_info" value="{{$event['payment_info']}}">
             <input type="hidden" name="location" value="{{$event['location']}}">
             <input type="hidden" name="additional_info" value="{{$event['additional_info']}}">
             <input type="hidden" name="event_banner" value="{{$event['event_banner']}}">
 
             @foreach ($event['ticket_name'] as $index => $ticket )
-            <input
-            type="hidden"
-            value="{{$ticket}}"
-            name="ticket_name[]"
-            placeholder="Digite o nome do ingresso"
-            style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"
-        />
-        <input
-        type="hidden"
-        name="ticket_price[]"
-        value="{{$event['ticket_price'][$index]}}"
-        style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"
-    />
+            @if(!empty($ticket))
+                    <input type="hidden" value="{{$ticket}}" name="ticket_name[]">
+                    <input type="hidden" name="ticket_price[]" value="{{$event['ticket_price'][$index]}}">
+                @endif
             @endforeach
 
-            <input type="hidden" required value="{{$event['vacancies']}}" name="vacancies">
-        <button
-            type="button"
-            style="
-                padding: 10px 20px;
-                background-color: #FFE047;
-                color: #2B293D;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                cursor: pointer;
-                font-weight: 600;
-            "
-        >
-            Publicar mais tarde
-        </button>
 
-        <button
-            type="submit"
-            style="
-                padding: 10px 20px;
-                background-color: #2B293D;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                cursor: pointer;
-            "
-        >
-            Publicar
-        </button>
-    </form>
+
+            <input type="hidden" value="{{$event['vacancies']}}" name="vacancies">
+
+            <button
+                type="submit"
+                name="action"
+                value="save_later"
+                style="
+                    padding: 10px 20px;
+                    background-color: #FFE047;
+                    color: #2B293D;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                "
+            >
+                Publicar mais tarde
+            </button>
+
+            <button
+                type="submit"
+                name="action"
+                value="publish"
+                style="
+                    padding: 10px 20px;
+                    background-color: #2B293D;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                "
+            >
+                Publicar
+            </button>
+        </form>
+
     </div>
 </div>
 

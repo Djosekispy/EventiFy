@@ -13,7 +13,7 @@
 </div>
 
 <div style="padding: 20px; margin: 12px;">
-    <form action="/event/review" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: auto;">
+    <form action="/event/review" method="post"  style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: auto;">
        @csrf
         <h4 style="font-weight: bold; font-size: 1.5rem; margin-bottom: 12px; text-align: center; color: #333;">
             Qual tipo de acesso está disponível?
@@ -31,9 +31,8 @@
         <input type="hidden" name="additional_info" value="{{$event['additional_info']}}">
         <input type="hidden" name="event_banner" value="{{$event['event_banner']}}">
         <input type="hidden" name="event_type" value="{{$event['event_type']}}">
-        <input type="hidden" required value="{{$event['vacancies']}}" name="vacancies">
+        <input type="hidden" value="{{$event['vacancies']}}" name="vacancies">
 
-        <!-- Tipo de ingresso -->
         <div style="display: flex; flex-direction: row; gap: 8px;">
             <div id="ticket-paid" class="ticket-option" style="border: 2px solid #2B293D; border-radius: 20px; padding: 16px 20px; text-align: center; cursor: pointer;">
                 <img src="{{ asset('storage/vector.png') }}" alt="" style="width: 50px; height: 50px; margin-bottom: 8px;" />
@@ -48,7 +47,6 @@
             </div>
         </div>
 
-        <!-- Formulário de ingressos (inicia escondido) -->
         <div id="ticket-form" style="display: none; flex-direction: column; gap: 16px;">
             <label for="category" style="font-weight: 500; font-size: 1rem;">Tipo de ingressos</label>
             <div id="ticket-fields">
@@ -57,7 +55,6 @@
                         <label for="ticket-name">Nome do Ingresso</label>
                         <input
                             type="text"
-                            required
                             name="ticket_name[]"
                             placeholder="Digite o nome do ingresso"
                             style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"
@@ -67,7 +64,6 @@
                         <label for="ticket-price">Preço</label>
                         <input
                             type="number"
-                            required
                             name="ticket_price[]"
                             placeholder="Digite o preço"
                             style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"
@@ -111,7 +107,6 @@
     </form>
 </div>
 
-<!-- JavaScript -->
 <script>
     const ticketPaid = document.getElementById('ticket-paid');
     const ticketFree = document.getElementById('ticket-free');
@@ -120,22 +115,41 @@
     const ticketFields = document.getElementById('ticket-fields');
     const payment_info = document.getElementById('payment_info');
 
-    // Troca de seleção e exibição do formulário
+
     ticketPaid.addEventListener('click', function () {
-        ticketPaid.style.backgroundColor = '#d3d3d3'; // Cor de fundo selecionada
-        ticketFree.style.backgroundColor = ''; // Reset
+        ticketPaid.style.backgroundColor = '#d3d3d3';
+        ticketFree.style.backgroundColor = '';
         ticketForm.style.display = 'flex';
         payment_info.style.display = 'flex';
     });
 
     ticketFree.addEventListener('click', function () {
-        ticketFree.style.backgroundColor = '#d3d3d3'; // Cor de fundo selecionada
-        ticketPaid.style.backgroundColor = ''; // Reset
-        ticketForm.style.display = 'none'; // Oculta o formulário
-        payment_info.style.display = 'none';
-    });
+    ticketFree.style.backgroundColor = '#d3d3d3';
+    ticketPaid.style.backgroundColor = '';
+    ticketForm.style.display = 'none';
+    payment_info.style.display = 'none';
 
-    // Adiciona um novo campo de ingresso
+    const freeTicketName = document.createElement('input');
+    freeTicketName.type = 'hidden';
+    freeTicketName.name = 'ticket_name[]';
+    freeTicketName.value = 'free';
+    document.querySelector('form').appendChild(freeTicketName);
+
+    const freeTicketPrice = document.createElement('input');
+    freeTicketPrice.type = 'hidden';
+    freeTicketPrice.name = 'ticket_price[]';
+    freeTicketPrice.value = '0';
+    document.querySelector('form').appendChild(freeTicketPrice);
+
+    const freePaymentInfo = document.createElement('input');
+    freePaymentInfo.type = 'hidden';
+    freePaymentInfo.name = 'payment_info';
+    freePaymentInfo.value = 'Sem pagamento necessário';
+    document.querySelector('form').appendChild(freePaymentInfo);
+});
+
+
+
     addTicketButton.addEventListener('click', function () {
         const newField = document.createElement('div');
         newField.style.display = 'flex';
@@ -167,10 +181,9 @@
         `;
         ticketFields.appendChild(newField);
 
-        // Adicionar funcionalidade de remover
         const removeButtons = ticketFields.querySelectorAll('.remove-ticket');
         removeButtons.forEach(button => {
-            button.style.display = 'inline-block'; // Mostra botão
+            button.style.display = 'inline-block';
             button.addEventListener('click', function () {
                 this.parentElement.remove();
             });

@@ -62,6 +62,17 @@ Route::middleware([
         Route::post('/save', [EventController::class, 'store']);
     });
 
+    Route::post('/update/status/{id}', [EventController::class, 'updateStatus'])->name('update.status');
+
+    Route::get('/edit/general/{id}', [EventController::class, 'editGeneral'])->name('edit.general');
+    Route::post('/event/update/{id}', [EventController::class, 'update'])->name('event.update');
+
+    Route::get('/edit/cover/{id}', [EventController::class, 'editCover'])->name('edit.cover');
+    Route::put('/event/banner/{id}', [EventController::class, 'updateBanner'])->name('event.updateBanner');
+
+
+    Route::get('/edit/session/{id}', [EventController::class, 'editSession'])->name('edit.session');
+    Route::get('/edit/ticket/{id}', [EventController::class, 'editTicket'])->name('edit.ticket');
     Route::get('/delete/{id}', [EventController::class, 'destroy'])->name('delete');
 
     Route::get('/participate/{id}', [ParticipantController::class, 'show'])->name('participate');
