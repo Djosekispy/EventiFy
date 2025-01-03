@@ -93,8 +93,8 @@
                         <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->start_at }} - {{ $event->end_at }}</span>
                         <!-- Vagas e Interessados -->
                         <div class="flex gap-4">
-                            <span style="font-size: 14px;" class="text-sm text-gray-600">Vagas: {{ $event->vacancies }}</span>
-                            <span style="font-size: 14px;" class="text-sm text-gray-600">Interessados: {{ $event->total_participants }}</span>
+                            <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->vacancies }} Vagas</span>
+                            <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->total_participants }} Interessados</span>
                         </div>
                     </div>
                 </div>

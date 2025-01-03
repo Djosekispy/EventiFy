@@ -14,5 +14,9 @@ class Ticketsession extends Model
                 'end_at',
                 'events_id'
     ];
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'events_id');
+    }
 }
 

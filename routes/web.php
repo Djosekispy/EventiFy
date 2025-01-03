@@ -72,6 +72,8 @@ Route::middleware([
 
 
     Route::get('/edit/session/{id}', [EventController::class, 'editSession'])->name('edit.session');
+    Route::post('/event/sessions/{id}', [EventController::class, 'updateSessions'])->name('event.updateSessions');
+
     Route::get('/edit/ticket/{id}', [EventController::class, 'editTicket'])->name('edit.ticket');
     Route::get('/delete/{id}', [EventController::class, 'destroy'])->name('delete');
 

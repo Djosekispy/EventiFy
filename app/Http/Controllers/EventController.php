@@ -31,6 +31,7 @@ class EventController extends Controller
     public function index()
     {
        try {
+        
         $events = DB::table('events')
         ->join('categories','categories.id','=','events.category_id')
         ->leftJoin('participants','participants.events_id','=','events.id')
@@ -39,7 +40,7 @@ class EventController extends Controller
         ->select('events.*', 'categories.category_title', DB::raw('COUNT(participants.id) as total_participants'), 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
         ->groupBy('events.id', 'categories.category_title', 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
         ->get();
-
+     //dd($events);
         $events_online = DB::table('events')
         ->join('categories','categories.id','=','events.category_id')
         ->leftJoin('participants','participants.events_id','=','events.id')
@@ -247,7 +248,6 @@ class EventController extends Controller
     }
     public function update(Request $request, $id)
     {
-        // Validação dos dados
         $validatedData = $request->validate([
             'event_theme' => 'required|string|max:255',
             'category' => 'required|exists:categories,id',
@@ -573,6 +573,60 @@ public function editSession($id)
         return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
     }
 }
+
+public function updateSessions(Request $request, $id)
+{
+    try {
+        $request->validate([
+            'session_id.*' => 'nullable|integer|exists:ticketsessions,id',
+            'session_date.*' => 'required|date',
+            'session_start_time.*' => 'required|date_format:H:i',
+            'session_end_time.*' => 'required|date_format:H:i|after:session_start_time.*',
+        ]);
+
+        $event = Event::findOrFail($id);
+        if ($request->has('removed_sessions')) {
+            TicketSession::whereIn('id', $request->removed_sessions)->delete();
+        }
+
+        foreach ($request->session_end_time as $index => $endTime) {
+            if (!preg_match('/^\d{2}:\d{2}$/', $endTime)) {
+                return redirect()->back()->with('error', 'Hora de término inválida no formato HH:MM');
+            }
+        }
+        
+
+        foreach ($request->session_date as $index => $date) {
+            $sessionId = $request->session_id[$index] ?? null;
+
+            $sessionData = [
+                'realized_at' => $date,
+                'start_at' => $request->session_start_time[$index],
+                'end_at' => $request->session_end_time[$index],
+            ];
+            if ($sessionId) {
+                $session = TicketSession::find($sessionId);
+                if ($session) {
+                    $session->update($sessionData);
+                }
+            } else {
+                TicketSession::create([
+                    'events_id' => $event->id,
+                    ...$sessionData,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return redirect()
+            ->back()
+            ->with('success',  'Sessões atualizadas com sucesso!');
+    } catch (\Throwable $th) {
+        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+    }
+}
+
 
 public function editTicket($id)
 {

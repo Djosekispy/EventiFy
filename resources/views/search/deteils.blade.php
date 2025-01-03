@@ -85,9 +85,59 @@
 </style>
 @section('content')
 
-<div style="width: 100%; height: 500px; padding: 20px; overflow: hidden;">
-    <img src="{{url('storage/'.$event['event'][0]->banner_image)}}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+<div style="width: 100%; height: 500px; padding: 20px; overflow: hidden; position: relative;">
+    <img 
+        id="event-image" 
+        src="{{ url('storage/'.$event['event'][0]->banner_image) }}" 
+        alt="Banner do Evento" 
+        style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+    >
 </div>
+
+<div 
+    id="image-modal" 
+    style="
+        display: none; 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0, 0, 0, 0.8); 
+        justify-content: center; 
+        align-items: center; 
+        z-index: 1000;
+    "
+>
+    <img 
+        id="modal-image" 
+        src="{{ url('storage/'.$event['event'][0]->banner_image) }}" 
+        alt="Imagem Ampliada" 
+        style="
+            max-width: 90%; 
+            max-height: 90%; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        "
+    >
+    <button 
+        id="close-modal" 
+        style="
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: #fff; 
+            border: none; 
+            padding: 10px 20px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            border-radius: 5px;
+        "
+    >
+        Fechar
+    </button>
+</div>
+
 
 <div class="event-container">
     <div class="event-details">
@@ -416,7 +466,20 @@ function toggleMenuEdit() {
     menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
 }
 
-
+const eventImage = document.getElementById('event-image');
+    const imageModal = document.getElementById('image-modal');
+    const closeModal = document.getElementById('close-modal');
+    eventImage.addEventListener('click', () => {
+        imageModal.style.display = 'flex';
+    });
+    closeModal.addEventListener('click', () => {
+        imageModal.style.display = 'none';
+    });
+    imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) {
+            imageModal.style.display = 'none';
+        }
+    });
   </script>
 
 

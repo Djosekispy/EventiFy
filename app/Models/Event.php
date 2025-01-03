@@ -26,4 +26,9 @@ class Event extends Model
 {
     return $this->hasMany(Participant::class);
 }
+
+public function ticketSessions()
+{
+    return $this->hasMany(TicketSession::class, 'events_id');
+}
 }
