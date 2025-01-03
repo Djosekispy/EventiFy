@@ -2,9 +2,18 @@
 @section('title', 'Definições de Conta')
 @section('content')
 
+<style>
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 <div style="display: flex; height: 100vh;">
 
-    <!-- Menu lateral -->
     <aside style="width: 25%; background-color: #EEEEEE; padding: 20px; border-right: 1px solid #CCC;">
         <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; text-align: center;">Definições de Conta</h2>
         <nav style="display: flex; flex-direction: column; gap: 12px;">
@@ -33,15 +42,46 @@
             {{ session('status') }}
         </div>
     @endif
-        <!-- Por padrão, renderiza as Informações Pessoais -->
         <section id="personal-info" style="display: block; overflow-y: hidden;">
             <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">Informações Pessoais</h2>
-            <div style="display: flex; justify-content: center;">
-                <img
-                src="{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}"
-                alt="Avatar do usuário"
-                style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #CCC;">
+            <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <!-- Container da imagem -->
+                <label for="profile-photo-input" style="cursor: pointer; position: relative;">
+                    <!-- Imagem do perfil -->
+                    <img
+                        id="profile-photo"
+                        src="{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}"
+                        alt="Avatar do usuário"
+                        style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #CCC;"
+                    >
+                    <!-- Spinner de loading -->
+                    <div
+                        id="loading-spinner"
+                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;"
+                    >
+                        <div style="width: 30px; height: 30px; border: 4px solid rgba(0, 0, 0, 0.2); border-top-color: #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    </div>
+                </label>
+                
+                <!-- Input para carregar imagem (escondido) -->
+                <input
+                    type="file"
+                    id="profile-photo-input"
+                    accept="image/*"
+                    style="display: none;"
+                >
+                
+                <!-- Botões de ação -->
+                <div id="action-buttons" style="display: none; flex-direction: row; gap: 10px;">
+                    <button id="update-button" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Atualizar Imagem
+                    </button>
+                    <button id="cancel-button" style="padding: 10px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Cancelar
+                    </button>
+                </div>
             </div>
+         
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
                 <form action="/updateProfile" method="POST" style="width: 100%; display: flex; flex-direction: column; gap: 16px;">
                     @csrf
@@ -141,18 +181,67 @@
 
 <script>
     function selectMenuItem(button, sectionId) {
-        // Reset all buttons
         document.querySelectorAll('aside button').forEach(btn => {
             btn.style.backgroundColor = '#EEEEEE';
         });
-        // Highlight the selected button
         button.style.backgroundColor = '#FFFFFF';
-
-        // Render the selected section
         document.querySelectorAll('main section').forEach(section => {
             section.style.display = section.id === sectionId ? 'block' : 'none';
         });
     }
+    const profilePhoto = document.getElementById('profile-photo');
+    const profilePhotoInput = document.getElementById('profile-photo-input');
+    const actionButtons = document.getElementById('action-buttons');
+    const updateButton = document.getElementById('update-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    profilePhoto.addEventListener('click', () => {
+        profilePhotoInput.click();
+    });
+    profilePhotoInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            loadingSpinner.style.display = 'block';
+            reader.onload = function (e) {
+                profilePhoto.src = e.target.result;
+                loadingSpinner.style.display = 'none';
+                actionButtons.style.display = 'flex';
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+    cancelButton.addEventListener('click', () => {
+        profilePhoto.src = "{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}";
+        actionButtons.style.display = 'none';
+        loadingSpinner.style.display = 'none';
+        profilePhotoInput.value = '';
+    });
+
+    updateButton.addEventListener('click', () => {
+        const formData = new FormData();
+        formData.append('profile_image', profilePhotoInput.files[0]);
+        loadingSpinner.style.display = 'block';
+
+        fetch('/profile/update-photo', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+            },
+            body: formData
+        })
+        .then(response => {
+                alert('Imagem atualizada com sucesso!');
+           
+            actionButtons.style.display = 'none';
+            loadingSpinner.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            loadingSpinner.style.display = 'none';
+        });
+    });
 </script>
 
 @endsection

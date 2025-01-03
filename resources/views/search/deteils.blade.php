@@ -182,6 +182,7 @@
             </ul>
         @endif
     </div>
+
     <div style="text-align: center;">
         @if($event['event'][0]->deleted_at === NULL)
        @if(!$isParticipant && $event['event'][0]->user_id !== auth()->id())
@@ -194,32 +195,29 @@
        style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
        <span>{{$event['event'][0]->status}}</span>
    </a>
-
-   <div id="floating-menu"
-       style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; padding: 20px; background-color: #f8f9fa; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); border-radius: 10px; z-index: 1000; display: none; font-family: Arial, sans-serif;">
-       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-           <h3 style="margin: 0; font-size: 1.5rem; color: #343a40;">Atualizar estado do evento</h3>
-           <button onclick="toggleMenu()"
-               style="background: none; border: none; font-size: 1.2rem; color: #dc3545; cursor: pointer;">&times;</button>
-       </div>
-       <form action="{{ route('update.status', ['id' => $event['event'][0]->id]) }}" method="POST">
-           @csrf
-           <div style="margin-bottom: 15px;">
-               <label for="status" style="display: block; font-size: 1rem; margin-bottom: 5px; color: #495057;">Estado:</label>
-               <select name="status" id="status"
-                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 1rem; color: #495057;">
-                   <option value="Publicado" {{$event['event'][0]->status == 'Publicado' ? 'selected' : ''}}>Publicado</option>
-                   <option value="Pendente" {{$event['event'][0]->status == 'Pendente' ? 'selected' : ''}}>Pendente</option>
-                   <option value="Cancelado" {{$event['event'][0]->status == 'Cancelado' ? 'selected' : ''}}>Cancelado</option>
-                   <option value="Realizado" {{$event['event'][0]->status == 'Realizado' ? 'selected' : ''}}>Realizado</option>
-               </select>
-           </div>
-           <button type="submit"
-               style="width: 100%; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer;">Submeter</button>
-       </form>
-   </div>
-
-
+            <div id="floating-menu"
+                style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; padding: 20px; background-color: #f8f9fa; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); border-radius: 10px; z-index: 1000; display: none; font-family: Arial, sans-serif;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 1.5rem; color: #343a40;">Atualizar estado do evento</h3>
+                    <button onclick="toggleMenu()"
+                        style="background: none; border: none; font-size: 1.2rem; color: #dc3545; cursor: pointer;">&times;</button>
+                </div>
+                <form action="{{ route('update.status', ['id' => $event['event'][0]->id]) }}" method="POST">
+                    @csrf
+                    <div style="margin-bottom: 15px;">
+                        <label for="status" style="display: block; font-size: 1rem; margin-bottom: 5px; color: #495057;">Estado:</label>
+                        <select name="status" id="status"
+                            style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 1rem; color: #495057;">
+                            <option value="Publicado" {{$event['event'][0]->status == 'Publicado' ? 'selected' : ''}}>Publicado</option>
+                            <option value="Pendente" {{$event['event'][0]->status == 'Pendente' ? 'selected' : ''}}>Pendente</option>
+                            <option value="Cancelado" {{$event['event'][0]->status == 'Cancelado' ? 'selected' : ''}}>Cancelado</option>
+                            <option value="Realizado" {{$event['event'][0]->status == 'Realizado' ? 'selected' : ''}}>Realizado</option>
+                        </select>
+                    </div>
+                    <button type="submit"
+                        style="width: 100%; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer;">Submeter</button>
+                </form>
+            </div>
        <button
        href="javascript:void(0)" onclick="toggleMenuEdit()"
        style="color: #007bff;padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; transition: background-color 0.2s ease;" onclick="editarEvento()">
@@ -259,26 +257,19 @@
         </li>
     </ul>
 </div>
-
-
-
-
     <button style="color: #dc3545; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; transition: background-color 0.2s ease;" onclick="deletarEvento(event, '{{ route('delete', ['id' => $event['event'][0]->id]) }}')">
         <i class="fas fa-trash"></i>
     </button>
-
-<div id="confirmDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #fff; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); padding: 20px; z-index: 1000; text-align: center; width: 300px;">
-    <p style="font-size: 16px; margin-bottom: 20px;">Tem certeza que deseja deletar?</p>
-    <div style="display: flex; justify-content: space-around;">
-        <button onclick="confirmDelete()" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Sim</button>
-        <button onclick="cancelDelete()" style="background-color: #6c757d; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Não</button>
-    </div>
-</div>
-<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
-
-
+        <div id="confirmDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #fff; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); padding: 20px; z-index: 1000; text-align: center; width: 300px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">Tem certeza que deseja deletar?</p>
+            <div style="display: flex; justify-content: space-around;">
+                <button onclick="confirmDelete()" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Sim</button>
+                <button onclick="cancelDelete()" style="background-color: #6c757d; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Não</button>
+            </div>
+        </div>
+        <div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
        @endif
-       <div style="display: flex; flex-direction: row; margin-top: 10px; gap: 10; justify-content: center,; justify-items: center;">
+       <div style="display: flex; flex-direction: row; text-align: center; margin-top: 10px; gap: 10; justify-content: center,; justify-items: center;">
         <button style="color: #007bff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease;" onclick="abrirFormularioConvite()">
             <i class="fa-duotone fa-solid fa-envelope"></i>
         </button>
@@ -288,8 +279,6 @@
        </div>
        @endif
     </div>
-
-
 </div>
 <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
   Link copiado com sucesso!

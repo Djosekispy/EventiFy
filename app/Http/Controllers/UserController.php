@@ -62,4 +62,20 @@ class UserController extends Controller
     }
 
    }
+public function updateProfileImage(Request $request)
+{
+    try {
+        $validatedData = $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = User::find(auth()->id());
+        $filePath = $request->file('profile_image')->store('uploads', 'public');
+        $user->profile_photo_path = $filePath;
+            $user->save();
+        return back()->with('status', 'Imagem de perfil atualizada com sucesso!');
+    } catch (\Throwable $th) {
+        return back()->withErrors(['profile_image' => $th->getMessage()]);
+    }
+}
 }

@@ -77,6 +77,8 @@ Route::middleware([
     Route::get('/edit/ticket/{id}', [EventController::class, 'editTicket'])->name('edit.ticket');
     Route::get('/delete/{id}', [EventController::class, 'destroy'])->name('delete');
 
+    Route::post('/profile/update-photo', [UserController::class, 'updateProfileImage']);
+
     Route::get('/participate/{id}', [ParticipantController::class, 'show'])->name('participate');
 
     Route::get('/profile',function(){
