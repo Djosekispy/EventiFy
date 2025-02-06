@@ -273,7 +273,9 @@ button:focus {
 
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4l-4-4m5 5l-4 4M5 3a2 2 0 100 4h14l-5 5v-5zm-3 4a3 3 0 100-6 3 3 0 000 6zm-4 4a2 2 0 110-4h14a2 2 0 110 4M5 20a2 2 0 100-4h14a2 2 0 100 4m-4-4a2 2 0 110-4h14a2 2 0 110 4" />
               </svg>
+              <a href="/event/form">
               <span>Criar Evento</span>
+            </a>
             </button></div>
         </div>
        </div>

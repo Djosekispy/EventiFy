@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Event;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class EventObserver
 {

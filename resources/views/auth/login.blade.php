@@ -1,72 +1,52 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">
-                    Bem-vindo de volta!
-                </h1>
-                <p class="text-sm text-gray-600">
-                    Faça login para acessar sua conta e aproveitar todos os recursos.
-                </p>
+@extends('includes.body')
+@section('title', 'Login')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('content')
+
+    <div class="d-flex justify-content-center align-items-center m-4">
+        <div class="shadow p-4 rounded" style="width: 100%; max-width: 500px;">
+            <div class="text-center mb-6 ">
+                <h2 class="text-2xl font-semibold text-gray-800">Entrar</h2>
+                <p class="text-gray-600">Por favor, preencha os campos abaixo para poder entrar.</p>
             </div>
-        </x-slot>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
 
-        <!-- Validation Errors -->
-        <x-validation-errors class="mb-4" />
-
-        @if (session('status'))
-            <div class="mb-4 text-sm font-medium text-green-600">
-                {{ session('status') }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}" class="space-y-6">
-            @csrf
-
-            <!-- Email Address -->
-            <div>
-                <x-label for="email" value="{{ __('Email') }}" class="text-base font-semibold text-gray-700" />
-                <x-input id="email" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                         type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="Digite seu email" />
-            </div>
-
-            <!-- Password -->
-            <div>
-                <x-label for="password" value="{{ __('Senha') }}" class="text-base font-semibold text-gray-700" />
-                <x-input id="password" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                         type="password" name="password" required autocomplete="current-password" placeholder="Digite sua senha" />
-            </div>
-
-            <!-- Remember Me -->
-            <div class="flex items-center">
-                <x-checkbox id="remember_me" name="remember" />
-                <label for="remember_me" class="ms-2 text-sm text-gray-600">
-                    {{ __('Lembrar-me') }}
-                </label>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex flex-col items-center space-y-2 sm:flex-row sm:justify-between sm:space-y-0">
-                <div class="text-sm text-gray-600">
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-indigo-600 hover:underline">
-                            {{ __('Esqueceu sua senha?') }}
-                        </a>
-                    @endif
+                <!-- Email Input -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-control form-control-lg" placeholder="Digite seu email" required autofocus>
                 </div>
-                <div class="text-sm text-gray-600">
-                    <a href="/register" class="text-indigo-600 hover:underline">
-                        {{ __('Criar Conta') }}
-                    </a>
+
+                <!-- Password Input -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Digite sua senha" required>
                 </div>
+
+                <!-- Forgot Password -->
+                <div class="mb-3 text-end">
+                    <a href="{{ route('password.request') }}" class="text-decoration-none">Esqueceu sua senha?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-dark btn-lg w-100">Entrar</button>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="text-center my-3">
+                <hr>
+                <span class="position-relative bg-white px-3" style="top: -12px;">Ou</span>
             </div>
 
-            <!-- Submit Button -->
-            <div class="mt-6">
-                <x-button class="w-full py-2 text-lg font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                    {{ __('Entrar') }}
-                </x-button>
+            <!-- Register Link -->
+            <div class="text-center">
+                <p class="mb-0">Ainda não tem uma conta? <a href="/register" class="text-decoration-none">Registe-se</a></p>
             </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@endsection

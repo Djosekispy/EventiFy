@@ -149,8 +149,8 @@
                 <nav class="flex items-center gap-6">
                     <ul class="flex gap-4 text-gray-700 font-medium" id='menu-list'>
                         <li><a href="/" class=" text-white p-2 rounded-md transition">Início</a></li>
-                        <li><a href="/galery" class=" text-black p-2 rounded-md transition">Galeria</a></li>
-                        <li><a href="#" class=" text-black p-2 rounded-md transition">Sobre nós</a></li>
+                        <li><a href="/galery" class=" text-white p-2 rounded-md transition">Galeria</a></li>
+                        <li><a href="#" class=" text-white p-2 rounded-md transition">Sobre nós</a></li>
                         @guest
                         <li><a href="/login" style="background-color: #00B37E;" class=" text-black px-4 py-2 rounded-md transition">Entrar</a></li>
                         <li><a href="/register" style="background-color: #FFE047;" class=" text-black px-4 py-2 rounded-md transition">Cadastrar</a></li>

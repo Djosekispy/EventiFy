@@ -107,12 +107,9 @@
                 class="cursor-pointer"
                 onclick="toggleImage(this)"
             >
-
         </div>
-    @endforeach
-</div>
 
-<div id="image-overlay" class="image-overlay flex items-center justify-center" onclick="toggleImage()">
+        <div id="image-overlay" class="image-overlay flex items-center justify-center" onclick="toggleImage()">
     <div class="image-overlay-content">
         <img id="image-large" src="" alt="Imagem ampliada">
         <div id="description-container" class="description-container">
@@ -120,6 +117,10 @@
         </div>
     </div>
 </div>
+    @endforeach
+</div>
+
+
 
 <script>
     let activeImage = null;
