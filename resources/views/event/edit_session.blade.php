@@ -1,120 +1,110 @@
 @extends('includes.body')
-@section('title', 'Editar sessão do Evento')
+@section('title', 'Editar Sessão do Evento')
 @section('content')
 
+<div class="container my-5">
+    <h1 class="text-center display-4 fw-bold mb-4">Editar Sessões do Evento</h1>
+    <h2 class="text-center h3 fw-bold mb-3">{{ $event->title }}</h2>
+    <h3 class="text-center h5 text-muted mb-5">{{ $event->location }}</h3>
 
-<h1 class="text-2xl font-serif font-bold text-center" style="padding: 20px;">Editar sessões do Evento</h1>
+    <!-- Mensagens de Sucesso e Erro -->
+    @if (session('success'))
+        <div class="alert alert-success text-center mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
 
-<h1 class="text-xl font-serif font-bold" style="padding-left: 50px; padding-top: 20px; font-weight: bold;">{{ $event->title }}</h1>
-<h2 class="text-lg font-serif font-bold" style="padding-left: 50px; font-weight: 500;">{{ $event->location }}</h2>
+    @if (session('error'))
+        <div class="alert alert-danger text-center mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
 
-@if (session('success'))
-    <div style="color: green; padding: 10px; border: 1px solid green; margin-bottom: 10px; max-width: 600px; margin: 0 auto;">
-        {{ session('success') }}
-    </div>
-@endif
+    <!-- Formulário de Edição de Sessões -->
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 800px;">
+        <form action="/event/sessions/{{ $event->id }}" method="post">
+            @csrf
 
+            <!-- Sessões -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Sessões</label>
+                <div id="session-container">
+                    @foreach($sessions as $session)
+                        <input type="hidden" name="session_id[]" value="{{ $session->id }}">
+                        <input type="hidden" name="removed_sessions[]" value="{{ $session->id }}">
 
-@if (session('error'))
-    <div style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 10px; max-width: 600px; margin: 0 auto;">
-        {{ session('error') }}
-    </div>
-@endif
-<div style="padding: 20px; margin: 12px;">
-    <form action="/event/sessions/{{$event->id}}" method="post" style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto;">
-        @csrf
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="font-weight: 500; font-size: 1rem;">Sessões</label>
-            <div id="session-container" style="display: flex; flex-direction: column; gap: 16px;">
-
-
-                @foreach($sessions as $session)
-                <input type="hidden" name="session_id[]" value="{{ $session->id }}">
-                <input type="hidden" name="removed_sessions[]" value="{{ $session->id }}">
-
-                <div class="session" style="display: flex; gap: 12px; align-items: flex-end;">
-                    <div style="flex: 1;">
-                        <label>Data de Início</label>
-                        <input type="date" required name="session_date[]" value="{{ \Carbon\Carbon::parse($session->realized_at)->format('Y-m-d') }}" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Hora de Início</label>
-                        <input type="time" required name="session_start_time[]" value="{{ $session->start_at }}" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Hora de Fim</label>
-                        <input type="time" required name="session_end_time[]" value="{{ $session->end_at }}" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <button type="button" class="remove-session" style="padding: 10px; background-color: red; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Remover
-                    </button>
+                        <div class="session mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label>Data de Início</label>
+                                    <input type="date" class="form-control" name="session_date[]" value="{{ \Carbon\Carbon::parse($session->realized_at)->format('Y-m-d') }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Hora de Início</label>
+                                    <input type="time" class="form-control" name="session_start_time[]" value="{{ $session->start_at }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Hora de Fim</label>
+                                    <input type="time" class="form-control" name="session_end_time[]" value="{{ $session->end_at }}" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm mt-2 remove-session">Remover</button>
+                        </div>
+                    @endforeach
                 </div>
-            @endforeach
-
+                <button type="button" id="add-session" class="btn btn-success btn-sm">Adicionar Sessão</button>
             </div>
-            <button type="button" id="add-session" style="padding: 10px; background-color: green; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                Adicionar Sessão
-            </button>
-        </div>
 
-        <div style="display: flex; flex-direction: row; gap: 12px; justify-content: flex-end;">
-            <button
-            type="button"
-            style="
-                padding: 10px 20px;
-                color: #2B293D;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-size: 1rem;
-                cursor: pointer;
-                font-weight: 600;
-            "
-             onclick="history.back()"
-        >
-            Voltar
-        </button>
-        <button type="submit" style="padding: 10px 20px; background-color: #2B293D; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer;">
-            Continuar
-        </button>
-        </div>
-    </form>
+            <!-- Botões de Ação -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">Voltar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
-    document.querySelectorAll('.remove-session').forEach(button => {
-    button.addEventListener('click', function () {
-        const sessionId = button.parentElement.querySelector('input[name="session_id[]"]').value;
-        if (sessionId) {
-            const removedSessions = document.querySelector('input[name="removed_sessions"]');
-            removedSessions.value += sessionId + ',';
-        }
-        button.parentElement.remove();
-    });
-});
-
+    // Adicionar nova sessão
     document.getElementById('add-session').addEventListener('click', function () {
         const sessionContainer = document.getElementById('session-container');
         const newSession = document.querySelector('.session').cloneNode(true);
         newSession.querySelectorAll('input').forEach(input => input.value = '');
         newSession.querySelector('.remove-session').addEventListener('click', function () {
+            const sessionId = newSession.querySelector('input[name="session_id[]"]').value;
+            if (sessionId) {
+                const removedSessions = document.querySelector('input[name="removed_sessions[]"]');
+                removedSessions.value += sessionId + ',';
+            }
             newSession.remove();
         });
         sessionContainer.appendChild(newSession);
     });
 
-    document.querySelector('form').addEventListener('submit', function(event) {
-    const sessionEndTimes = document.querySelectorAll('input[name="session_end_time[]"]');
-    sessionEndTimes.forEach(function(input) {
-        let value = input.value;
-        if (!/^\d{2}:\d{2}$/.test(value)) {
-            event.preventDefault();
-            alert('Por favor, insira a hora de término no formato correto HH:MM.');
-            return false;
-        }
+    // Remover sessão
+    document.querySelectorAll('.remove-session').forEach(button => {
+        button.addEventListener('click', function () {
+            const sessionId = button.parentElement.querySelector('input[name="session_id[]"]').value;
+            if (sessionId) {
+                const removedSessions = document.querySelector('input[name="removed_sessions[]"]');
+                removedSessions.value += sessionId + ',';
+            }
+            button.parentElement.remove();
+        });
     });
-});
 
-
+    // Validação do formulário
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const sessionEndTimes = document.querySelectorAll('input[name="session_end_time[]"]');
+        sessionEndTimes.forEach(function(input) {
+            let value = input.value;
+            if (!/^\d{2}:\d{2}$/.test(value)) {
+                event.preventDefault();
+                alert('Por favor, insira a hora de término no formato correto HH:MM.');
+                return false;
+            }
+        });
+    });
 </script>
+
 @endsection

@@ -12,192 +12,167 @@
         }
     }
 </style>
-<div style="display: flex; height: 100vh;">
 
-    <aside style="width: 25%; background-color: #EEEEEE; padding: 20px; border-right: 1px solid #CCC;">
-        <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; text-align: center;">Definições de Conta</h2>
-        <nav style="display: flex; flex-direction: column; gap: 12px;">
-            <button
-                onclick="selectMenuItem(this, 'personal-info')"
-                style="padding: 12px; background-color: #EEEEEE; border: none; color: #333; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 4px;">
-                Informações Pessoais
-            </button>
-            <button
-                onclick="selectMenuItem(this, 'change-email')"
-                style="padding: 12px; background-color: #EEEEEE; border: none; color: #333; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 4px;">
-                Mudar Email
-            </button>
-            <button
-                onclick="selectMenuItem(this, 'change-password')"
-                style="padding: 12px; background-color: #EEEEEE; border: none; color: #333; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 4px;">
-                Alterar Senha
-            </button>
-        </nav>
-    </aside>
-
-    <!-- Conteúdo -->
-    <main id="content-section" style="width: 75%; padding: 40px; overflow-y: auto;">
-        @if(session()->has('status'))
-        <div class="alert alert-success" style="background-color: #DFF0D8; color: #3E8E41; border: 1px solid #C6E2B5; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
-            {{ session('status') }}
-        </div>
-    @endif
-        <section id="personal-info" style="display: block; overflow-y: hidden;">
-            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">Informações Pessoais</h2>
-            <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <!-- Container da imagem -->
-                <label for="profile-photo-input" style="cursor: pointer; position: relative;">
-                    <!-- Imagem do perfil -->
-                    <img
-                        id="profile-photo"
-                        src="{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}"
-                        alt="Avatar do usuário"
-                        style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #CCC;"
-                    >
-                    <!-- Spinner de loading -->
-                    <div
-                        id="loading-spinner"
-                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;"
-                    >
-                        <div style="width: 30px; height: 30px; border: 4px solid rgba(0, 0, 0, 0.2); border-top-color: #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                    </div>
-                </label>
-                
-                <!-- Input para carregar imagem (escondido) -->
-                <input
-                    type="file"
-                    id="profile-photo-input"
-                    accept="image/*"
-                    style="display: none;"
-                >
-                
-                <!-- Botões de ação -->
-                <div id="action-buttons" style="display: none; flex-direction: row; gap: 10px;">
-                    <button id="update-button" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Atualizar Imagem
-                    </button>
-                    <button id="cancel-button" style="padding: 10px 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Cancelar
-                    </button>
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <aside class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4 fw-bold text-center mb-4">Definições de Conta</h2>
+                    <nav class="d-flex flex-column gap-2">
+                        <button class="btn btn-outline-secondary text-start" data-bs-toggle="modal" data-bs-target="#personalInfoModal">
+                            Informações Pessoais
+                        </button>
+                        <button class="btn btn-outline-secondary text-start" data-bs-toggle="modal" data-bs-target="#changeEmailModal">
+                            Mudar Email
+                        </button>
+                        <button class="btn btn-outline-secondary text-start" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            Alterar Senha
+                        </button>
+                    </nav>
                 </div>
             </div>
-         
-            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                <form action="/updateProfile" method="POST" style="width: 100%; display: flex; flex-direction: column; gap: 16px;">
-                    @csrf
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="name" style="font-size: 1rem; font-weight: bold;">Nome Completo</label>
-                        <input type="text" id="name" name="name" value="{{ auth()->user()->name }}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="phone" style="font-size: 1rem; font-weight: bold;">Telefone</label>
-                        <input type="text" id="phone" name="phone" placeholder="Seu Telefone" value="{{auth()->user()->phone ? auth()->user()->phone : '' }}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="col-md-9">
+            @if(session()->has('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <!-- Seção de Informações Pessoais -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center gap-3 mb-4">
+                        <!-- Container da Imagem -->
+                        <label for="profile-photo-input" class="cursor-pointer position-relative">
+                            <img
+                                id="profile-photo"
+                                src="{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}"
+                                alt="Avatar do usuário"
+                                class="rounded-circle object-fit-cover"
+                                style="width: 120px; height: 120px; border: 2px solid #dee2e6;"
+                            >
+                            <!-- Spinner de Loading -->
+                            <div id="loading-spinner" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
+                                <div class="spinner-border text-success" role="status"></div>
+                            </div>
+                        </label>
+                        <!-- Input para Carregar Imagem -->
+                        <input type="file" id="profile-photo-input" accept="image/*" class="d-none">
+                        <!-- Botões de Ação -->
+                        <div id="action-buttons" class="d-none gap-2">
+                            <button id="update-button" class="btn btn-success">Atualizar Imagem</button>
+                            <button id="cancel-button" class="btn btn-danger">Cancelar</button>
+                        </div>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="phone" style="font-size: 1rem; font-weight: bold;">website</label>
-                        <input type="text" id="phone" name="website" placeholder="Site ou endereço digital" value="{{auth()->user()->website ? auth()->user()->website : '' }}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
+                    <!-- Formulário de Informações Pessoais -->
+                    <form action="/updateProfile" method="POST" class="d-flex flex-column gap-3">
+                        @csrf
+                        <div class="form-group">
+                            <label for="name" class="form-label fw-bold">Nome Completo</label>
+                            <input type="text" id="name" name="name" value="{{ auth()->user()->name }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="form-label fw-bold">Telefone</label>
+                            <input type="text" id="phone" name="phone" placeholder="Seu Telefone" value="{{ auth()->user()->phone }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="website" class="form-label fw-bold">Website</label>
+                            <input type="text" id="website" name="website" placeholder="Site ou endereço digital" value="{{ auth()->user()->website }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="country" class="form-label fw-bold">País</label>
+                            <input type="text" id="country" name="country" placeholder="País de Origem" value="{{ auth()->user()->country }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="city" class="form-label fw-bold">Cidade</label>
+                            <input type="text" id="city" name="city" placeholder="Cidade em que mora" value="{{ auth()->user()->city }}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="company" class="form-label fw-bold">Empresa</label>
+                            <input type="text" id="company" name="company" placeholder="Nome da Empresa" value="{{ auth()->user()->company }}" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Mudar Email -->
+<div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="changeEmailModalLabel">Mudar Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-4">Email atual: <b>{{ auth()->user()->email }}</b></p>
+                <form action="/updateEmail" method="POST" class="d-flex flex-column gap-3">
+                    @csrf
+                    <div class="form-group">
+                        <label for="new-email" class="form-label fw-bold">Novo Email</label>
+                        <input type="email" id="new-email" name="new_email" required class="form-control @error('new_email') is-invalid @enderror">
+                        @error('new_email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="phone" style="font-size: 1rem; font-weight: bold;">País</label>
-                        <input type="text" id="phone" name="contry" placeholder="País de Origem" value="{{auth()->user()->contry ? auth()->user()->contry : ''}}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
+                    <div class="form-group">
+                        <label for="confirm-email" class="form-label fw-bold">Confirmar Novo Email</label>
+                        <input type="email" id="confirm-email" name="confirm_email" class="form-control">
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="phone" style="font-size: 1rem; font-weight: bold;">Cidade</label>
-                        <input type="text" id="phone" name="city" placeholder="Cidade em que mora" value="{{auth()->user()->city ? auth()->user()->city : ''}}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <label for="phone" style="font-size: 1rem; font-weight: bold;">Empresa</label>
-                        <input type="text" id="phone" name="company" placeholder="Nome da Empresa" value="{{auth()->user()->company ? auth()->user()->company : ''}}"
-                            style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <button type="submit"
-                        style="padding: 10px; background-color: #333; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
-                        Salvar
-                    </button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
                 </form>
             </div>
-        </section>
+        </div>
+    </div>
+</div>
 
-        <section id="change-email" style="display: none;">
-            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">Mudar Email</h2>
-            <p style="margin-bottom: 20px; font-size: 1rem;">Email atual: <b>{{auth()->user()->email}}</b></p>
-            <form action="/updateEmail" method="POST" style="width: 100%; display: flex; flex-direction: column; gap: 16px;">
-                @csrf
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label for="new-email" style="font-size: 1rem; font-weight: bold;">Novo Email</label>
-                    <input type="email" id="new_email" name="new_email" required @error('new_email') is-invalid @enderror
-                        style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                        @error('new_email')
-                        <div class="alert alert-danger" role="alert">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label for="confirm-email" style="font-size: 1rem; font-weight: bold;">Confirmar Novo Email</label>
-                    <input type="email" id="confirm_email" name="confirm_email"
-                        style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                </div>
-                <button type="submit"
-                    style="padding: 10px; background-color: #333; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
-                    Salvar
-                </button>
-            </form>
-        </section>
-
-        <section id="change-password" style="display: none;">
-            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">Alterar Senha</h2>
-            <form action="/updatePassword" method="POST" style="width: 100%; display: flex; flex-direction: column; gap: 16px;">
-                @csrf
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label for="new-password" style="font-size: 1rem; font-weight: bold;">Nova Senha</label>
-                    <input type="password" id="new-password" name="new_password" placeholder="Nova Senha" required @error('new_password') is-invalid @enderror
-                    style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                    @error('new_password')
-                        <div class="alert alert-danger" role="alert">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label for="confirm-password" style="font-size: 1rem; font-weight: bold;">Confirmar Nova Senha</label>
-                    <input type="password" id="confirm-password" placeholder="Confirmar senha" name="confirm_password"
-                        style="padding: 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 1rem;">
-                </div>
-                <button type="submit"
-                    style="padding: 10px; background-color: #333; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
-                    Salvar
-                </button>
-            </form>
-        </section>
-    </main>
+<!-- Modal para Alterar Senha -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="changePasswordModalLabel">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/updatePassword" method="POST" class="d-flex flex-column gap-3">
+                    @csrf
+                    <div class="form-group">
+                        <label for="new-password" class="form-label fw-bold">Nova Senha</label>
+                        <input type="password" id="new-password" name="new_password" required class="form-control @error('new_password') is-invalid @enderror">
+                        @error('new_password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password" class="form-label fw-bold">Confirmar Nova Senha</label>
+                        <input type="password" id="confirm-password" name="confirm_password" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    function selectMenuItem(button, sectionId) {
-        document.querySelectorAll('aside button').forEach(btn => {
-            btn.style.backgroundColor = '#EEEEEE';
-        });
-        button.style.backgroundColor = '#FFFFFF';
-        document.querySelectorAll('main section').forEach(section => {
-            section.style.display = section.id === sectionId ? 'block' : 'none';
-        });
-    }
     const profilePhoto = document.getElementById('profile-photo');
     const profilePhotoInput = document.getElementById('profile-photo-input');
     const actionButtons = document.getElementById('action-buttons');
     const updateButton = document.getElementById('update-button');
     const cancelButton = document.getElementById('cancel-button');
     const loadingSpinner = document.getElementById('loading-spinner');
-    profilePhoto.addEventListener('click', () => {
-        profilePhotoInput.click();
-    });
+
+    profilePhoto.addEventListener('click', () => profilePhotoInput.click());
     profilePhotoInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -206,15 +181,16 @@
             reader.onload = function (e) {
                 profilePhoto.src = e.target.result;
                 loadingSpinner.style.display = 'none';
-                actionButtons.style.display = 'flex';
+                actionButtons.classList.remove('d-none');
+                actionButtons.classList.add('d-flex');
             };
-
             reader.readAsDataURL(file);
         }
     });
+
     cancelButton.addEventListener('click', () => {
         profilePhoto.src = "{{ auth()->user()->profile_photo_path ? asset('storage/' . auth()->user()->profile_photo_path) : asset('storage/avatar.png') }}";
-        actionButtons.style.display = 'none';
+        actionButtons.classList.add('d-none');
         loadingSpinner.style.display = 'none';
         profilePhotoInput.value = '';
     });
@@ -227,14 +203,15 @@
         fetch('/profile/update-photo', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
             },
             body: formData
         })
         .then(response => {
+            if (response.ok) {
                 alert('Imagem atualizada com sucesso!');
-           
-            actionButtons.style.display = 'none';
+                actionButtons.classList.add('d-none');
+            }
             loadingSpinner.style.display = 'none';
         })
         .catch(error => {

@@ -13,6 +13,11 @@ Route::get('/interest',function(){
     return view('home.interests');
 });
 
+Route::get('/about',function(){
+    return view('about');
+});
+
+
 Route::get('/events',function(){
     return view('home.events');
 });
@@ -20,14 +25,11 @@ Route::get('/events',function(){
 
 
 
-Route::get('/search',[EventController::class,'search']);
+Route::post('/search',[EventController::class,'search']);
 Route::get('/deteils/{id}',[EventController::class, 'show']);
 Route::post('/invite',[EventController::class,'sendEmail']);
 Route::get('/search/category/{categoryId}', [EventController::class, 'searchByCategory'])->name('search.category');
 Route::get('/search/event-type/{eventTypeId}', [EventController::class, 'searchByEventType'])->name('search.event-type');
-// Rotas de Formulário de Evento
-
-
 
 Route::get('/galery', [EventController::class, 'galery']);
 
@@ -52,8 +54,8 @@ Route::middleware([
        return redirect()->back();
     });
     Route::get('/showAll', [EventController::class, 'showAll'])->name('your.event');
+    Route::resource('participants', ParticipantController::class);
 
-    //User Routes to managemant events
     Route::prefix('event')->group(function () {
         Route::get('/form', [EventController::class, 'create']);
         Route::post('/banner', [EventController::class, 'addImage']);
@@ -75,7 +77,7 @@ Route::middleware([
     Route::post('/event/sessions/{id}', [EventController::class, 'updateSessions'])->name('event.updateSessions');
 
     Route::get('/edit/ticket/{id}', [EventController::class, 'editTicket'])->name('edit.ticket');
-    Route::get('/delete/{id}', [EventController::class, 'destroy'])->name('delete');
+    Route::delete('/delete/{id}', [EventController::class, 'destroy'])->name('delete');
 
     Route::post('/profile/update-photo', [UserController::class, 'updateProfileImage']);
 

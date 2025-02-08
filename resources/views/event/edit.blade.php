@@ -1,100 +1,103 @@
 @extends('includes.body')
 @section('title', 'Criar Evento')
 @section('content')
-<h1 class="text-2xl font-serif font-bold text-center" style="padding: 20px;">Criar Novo Evento</h1>
 
-<div style="width: 70%; margin: 0 auto; padding: 20px; display: flex; justify-content: center;">
-    <img src="{{asset('storage/progress.png')}}" alt="Progresso" style="width: 100%; max-width: 800px; object-fit: cover;">
-</div>
+<div class="container my-5">
+    <h1 class="text-center display-4 fw-bold mb-4">Criar Novo Evento</h1>
 
-<div style="padding: 20px; margin: 12px;">
-    <form action="/event/banner" method="post" style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto;">
-        @csrf
-        <h4 style="font-weight: bold; font-size: 1.5rem; margin-bottom: 12px; text-align: center; color: #333;">Detalhes do Evento</h4>
+    <!-- Progress Bar -->
+    <div class="d-flex justify-content-center mb-5">
+        <img src="{{ asset('storage/progress.png') }}" alt="Progresso" class="img-fluid" style="max-width: 800px;">
+    </div>
 
-        <!-- Tema do Evento -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label for="event-theme" style="font-weight: 500; font-size: 1rem;">Tema do Evento</label>
-            <input type="text" required id="event-theme" name="event_theme" placeholder="Digite o tema do evento" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-        </div>
+    <!-- Formulário de Criação de Evento -->
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 800px;">
+        <form action="/event/banner" method="post">
+            @csrf
+            <h4 class="text-center fw-bold mb-4">Detalhes do Evento</h4>
 
-        <!-- Categoria -->
-        <div style="display: flex; flex-direction: row; gap: 8px;">
-            <div style="flex: 3;">
-            <label for="category" style="font-weight: 500; font-size: 1rem;">Categoria</label>
-            <select id="category" name="category" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                <option value="" disabled selected>Selecione</option>
-                @foreach ($categories as $index => $category )
-                <option value="{{$category->id}}">{{$category->category_title}}</option>
-                @endforeach
-            </select>
-        </div>
-            <div>
-                <label>Total de Vagas</label>
-                <input type="number" required required name="vacancies" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
+            <!-- Tema do Evento -->
+            <div class="mb-3">
+                <label for="event-theme" class="form-label fw-bold">Tema do Evento</label>
+                <input type="text" class="form-control" id="event-theme" name="event_theme" placeholder="Digite o tema do evento" required>
             </div>
-        </div>
 
-        <!-- Tipo de Evento -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="font-weight: 500; font-size: 1rem;">Tipo de Evento</label>
-            <div style="display: flex; gap: 12px;">
-                <label style="display: flex; align-items: center; gap: 8px;">
-                    <input type="radio" name="event_type" value="presencial">
-                    Presencial
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px;">
-                    <input type="radio"  name="event_type" value="online">
-                    Online
-                </label>
-            </div>
-        </div>
-
-        <!-- Sessões -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="font-weight: 500; font-size: 1rem;">Sessões</label>
-            <div id="session-container" style="display: flex; flex-direction: column; gap: 16px;">
-                <!-- Template de Sessão -->
-                <div class="session" style="display: flex; gap: 12px; align-items: flex-end;">
-                    <div style="flex: 1;">
-                        <label>Data de Início</label>
-                        <input type="date" required name="session_date[]" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Hora de Início</label>
-                        <input type="time" required name="session_start_time[]" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Hora de Fim</label>
-                        <input type="time" required name="session_end_time[]" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-                    </div>
-                    <button type="button" class="remove-session" style="padding: 10px; background-color: red; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Remover
-                    </button>
+            <!-- Categoria e Vagas -->
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label for="category" class="form-label fw-bold">Categoria</label>
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="" disabled selected>Selecione</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->category_title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="vacancies" class="form-label fw-bold">Total de Vagas</label>
+                    <input type="number" class="form-control" id="vacancies" name="vacancies" required>
                 </div>
             </div>
-            <button type="button" id="add-session" style="padding: 10px; background-color: green; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                Adicionar Sessão
-            </button>
-        </div>
 
-        <!-- Localização -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="font-weight: 500; font-size: 1rem;">Localização</label>
-            <input type="text" required name="location" placeholder="Digite o local do evento" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
-        </div>
+            <!-- Tipo de Evento -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tipo de Evento</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="event_type" id="presencial" value="presencial" required>
+                        <label class="form-check-label" for="presencial">Presencial</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="event_type" id="online" value="online" required>
+                        <label class="form-check-label" for="online">Online</label>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Informação Adicional -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <label style="font-weight: 500; font-size: 1rem;">Descrição</label>
-            <textarea name="additional_info" required placeholder="Digite informações adicionais" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"></textarea>
-        </div>
+            <!-- Sessões -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Sessões</label>
+                <div id="session-container">
+                    <!-- Template de Sessão -->
+                    <div class="session mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label>Data de Início</label>
+                                <input type="date" class="form-control" name="session_date[]" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Hora de Início</label>
+                                <input type="time" class="form-control" name="session_start_time[]" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Hora de Fim</label>
+                                <input type="time" class="form-control" name="session_end_time[]" required>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mt-2 remove-session">Remover</button>
+                    </div>
+                </div>
+                <button type="button" id="add-session" class="btn btn-success btn-sm">Adicionar Sessão</button>
+            </div>
 
-        <!-- Botão de Salvar -->
-        <button type="submit" style="padding: 10px 20px; background-color: #2B293D; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer;">
-            Continuar
-        </button>
-    </form>
+            <!-- Localização -->
+            <div class="mb-3">
+                <label for="location" class="form-label fw-bold">Localização</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="Digite o local do evento" required>
+            </div>
+
+            <!-- Descrição -->
+            <div class="mb-4">
+                <label for="additional_info" class="form-label fw-bold">Descrição</label>
+                <textarea class="form-control" id="additional_info" name="additional_info" rows="4" placeholder="Digite informações adicionais" required></textarea>
+            </div>
+
+            <!-- Botão de Continuar -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Continuar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -110,8 +113,9 @@
 
     document.querySelectorAll('.remove-session').forEach(button => {
         button.addEventListener('click', function () {
-            button.parentElement.remove();
+            button.closest('.session').remove();
         });
     });
 </script>
+
 @endsection

@@ -3,19 +3,29 @@
 @section('content')
 
 <style>
+    .gallery-container {
+        padding: 20px;
+    }
     .image-container {
         position: relative;
         overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
+    .image-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
     .image-container img {
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
     }
-
     .image-container:hover img {
         transform: scale(1.1);
     }
-
     .hover-description {
         position: absolute;
         bottom: 0;
@@ -28,126 +38,70 @@
         opacity: 0;
         transition: opacity 0.3s ease;
     }
-
     .image-container:hover .hover-description {
         opacity: 1;
     }
-
-    .image-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .image-overlay img {
-        max-width: 90%;
-        max-height: 90%;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-
-    .image-overlay.active {
-        display: flex;
-    }
-
-    .background-dimmed img:not(.active-image) {
-        opacity: 0.3;
-    }
-    .image-overlay-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 20px;
-        max-width: 90%;
-        text-align: center;
-        z-index: 2000;
-    }
-
-    .image-overlay img {
-        max-width: 60%;
-        max-height: 80%;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-
-    .description-container {
-        max-width: 60%;
-        color: #fff;
-        text-align: justify;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
+    .modal-content img {
+        max-width: 100%;
+        max-height: 80vh;
+        margin: auto;
         border-radius: 10px;
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     }
-
-    .description-container h2 {
-        font-size: 20px;
+    .description-container {
+        padding: 20px;
+        text-align: center;
+    }
+    .description-container h5 {
+        font-size: 1.5rem;
         font-weight: bold;
         margin-bottom: 10px;
     }
-
     .description-container p {
-        font-size: 14px;
-        line-height: 1.5;
+        font-size: 1rem;
+        color: #555;
     }
-
 </style>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
-    @foreach($events as $event)
-        <div class="image-container">
-            <img
-                src="{{ url('storage/' . $event->banner_image) }}"
-                alt="Imagem do evento"
-                class="cursor-pointer"
-                onclick="toggleImage(this)"
-            >
-        </div>
+<div class="gallery-container">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Galeria de Eventos</h1>
+        <p class="lead text-muted">Explore nossa coleção de eventos e descubra as melhores experiências.</p>
+    </div>
 
-        <div id="image-overlay" class="image-overlay flex items-center justify-center" onclick="toggleImage()">
-    <div class="image-overlay-content">
-        <img id="image-large" src="" alt="Imagem ampliada">
-        <div id="description-container" class="description-container">
-            <p id="image-description">{{$event->description}}</p>
-        </div>
+    <div class="row">
+        @foreach($events as $event)
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                <div class="image-container">
+                    <img
+                        src="{{ url('storage/' . $event->banner_image) }}"
+                        alt="Imagem do evento"
+                        class="img-fluid cursor-pointer"
+                        data-bs-toggle="modal" data-bs-target="#imageModal{{ $event->id }}"
+                    >
+                    <div class="hover-description">
+                        <p class="m-0">{{ $event->title }}</p>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="imageModal{{ $event->id }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-body p-0 m-auto py-2">
+                                <img src="{{ url('storage/' . $event->banner_image) }}" alt="Imagem do evento">
+                            </div>
+                            <div class="description-container">
+                                <h5>{{ $event->title }}</h5>
+                                <p>{{ $event->description }}</p>
+                                <p class="text-muted"><small>Local: {{ $event->location }}</small></p>
+                                <p class="text-muted"><small>Data: {{ \Carbon\Carbon::parse($event->realized_at)->format('d/m/Y') }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
 </div>
-    @endforeach
-</div>
-
-
-
-<script>
-    let activeImage = null;
-
-    function toggleImage(img = null) {
-        const overlay = document.getElementById('image-overlay');
-        const largeImage = document.getElementById('image-large');
-        const allImages = document.querySelectorAll('.image-container img');
-
-        if (img) {
-            if (activeImage === img) {
-                overlay.classList.remove('active');
-                allImages.forEach(image => image.classList.remove('active-image'));
-                activeImage = null;
-            } else {
-                largeImage.src = img.src;
-                overlay.classList.add('active');
-                allImages.forEach(image => image.classList.add('background-dimmed'));
-                img.classList.add('active-image');
-                activeImage = img;
-            }
-        } else {
-            overlay.classList.remove('active');
-            allImages.forEach(image => image.classList.remove('background-dimmed', 'active-image'));
-            activeImage = null;
-        }
-    }
-</script>
 
 @endsection

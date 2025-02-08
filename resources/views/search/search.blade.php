@@ -3,128 +3,97 @@
 @section('title', 'Buscar Eventos')
 
 @section('content')
-<style>
-    /* Estilo para o formulário */
-    form {
-        display: flex;
-        align-items: center;
-    }
 
-    /* Estilo para o input de busca */
-    .form-input {
-        width: 80%; /* Define a largura do input de busca */
-        padding: 0.5rem; /* Espaçamento interno do input */
-        border: 1px solid #ccc; /* Borda clara */
-        border-radius: 4px; /* Bordas arredondadas */
-        font-size: 1rem; /* Tamanho da fonte */
-    }
-
-    /* Estilo do botão de busca */
-    button {
-        padding: 0.5rem 1rem; /* Espaçamento interno */
-        background-color: #4F46E5; /* Cor de fundo do botão */
-        color: white; /* Cor do texto */
-        border-radius: 4px; /* Bordas arredondadas */
-        border: none; /* Sem borda */
-        cursor: pointer; /* Mostra o cursor de clique */
-    }
-
-    button:hover {
-        background-color: #4338CA; /* Cor do botão quando hover */
-    }
-
-    button:focus {
-        outline: none; /* Remove o contorno ao focar */
-        box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.4); /* Adiciona sombra ao foco */
-    }
-</style>
-
-<div class="bg-cover bg-center" style="height: 420px; background-image: url({{asset('storage/party.jpg')}});">
-    <div style="padding-top: 8rem; margin-bottom: 2rem; padding-left: 16%" class="flex flex-col justify-start text-justify items-start">
-        <span class="text-white font-bold font-serif" style="font-weight: bold; font-size: 2rem;">
-            Explore um mundo de <span style="color: #FFE047;"> eventos. </span> Encontre o seu favorito !
-        </span>
+<div class="bg-dark text-white text-center py-5" style="background-image: url('{{ asset('storage/party.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="container">
+        <h1 class="fw-bold">Explore um mundo de <span class="text-warning">eventos</span>. Encontre o seu favorito!</h1>
     </div>
-    <form action="/search" class="mt-8 flex justify-center items-center" style="width: 70%; margin: 2px auto;" method="GET">
-        <input type="text" name="query" class="form-input block w-48 mt-1 p-2 border border-gray-300 rounded-md" placeholder="Pesquisar...">
-        <select name="location" class="form-select mt-1 p-2 border border-gray-300 rounded-md">
-            <option value="">Selecione a Localização</option>
-            @foreach ($locations as $index => $loc)
-            <option value="{{$loc->location}}">{{$loc->location}}</option>
-            @endforeach
-        </select>
-        <button type="submit" style="margin-left: 12px;" class="mt-1 p-2 border border-gray-300 rounded-md bg-blue-500 text-white">
-            Buscar
-        </button>
+</div>
+
+<div class="container my-4">
+    <form action="/search" method="POST" class="row g-3 p-4 rounded-3 bg-white shadow-sm" id="filter-form">
+        @csrf
+        @method('POST')
+        <div class="col-md-4">
+            <input type="text" name="query" class="form-control form-control-md border-light shadow-sm" placeholder="Pesquisar eventos..." value="{{ request()->query('query') }}">
+        </div>
+        <div class="col-md-2">
+            <select name="category" class="form-select form-select-md border-light shadow-sm">
+                <option value="">Selecione a Categoria</option>
+                @foreach ($events as $category)
+                    <option value="{{ $category->category_title }}" {{ request()->query('category') == $category->category_title ? 'selected' : '' }}>{{ $category->category_title }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="date" class="form-control form-control-md border-light shadow-sm" value="{{ request()->query('date') }}">
+        </div>
+        <div class="col-md-2">
+            <select name="type" class="form-select form-select-md border-light shadow-sm">
+                <option value="">Selecione o Tipo</option>
+                <option value="online" {{ request()->query('type') == 'online' ? 'selected' : '' }}>Online</option>
+                <option value="offline" {{ request()->query('type') == 'offline' ? 'selected' : '' }}>Offline</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary btn-md w-100 shadow-sm">Buscar</button>
+        </div>
     </form>
 </div>
 
-<!-- Resultados -->
-<div style="padding-left: 8rem">
-    <div class="flex justify-center items-center px-4 py-6 bg-white flex-wrap">
-        <!-- Card -->
-        @if ($events->isEmpty())
-        <div style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-top: 20px;">
-            <strong>Atenção!</strong> Nenhum evento encontrado.
-        </div>
-    @else
-        @foreach($events as $event)
-            <div style="margin: 1.2rem 2rem;" class="flex flex-col row items-center gap-4">
-                <!-- Imagem com rótulos -->
-                <div class="relative rounded-md overflow-hidden" style="width: 15rem; height: 10rem;">
-                    <span style="position: absolute; top: 2px; right: 2px; background-color: rgb(98, 86, 86);" class="bg-black text-white text-xs font-semibold px-2 py-1 rounded-full p-2">★</span>
-                    <img src="{{ asset('storage/' . $event->banner_image) }}" alt="Evento" class="w-full h-full object-cover">
-                    <span style="position: absolute; bottom: 2px; left: 2px; background-color: #FFE047;" class="text-black text-xs font-semibold px-2 py-1 rounded">{{$event->status}}</span>
-                </div>
 
-                <!-- Informações do Evento -->
-                <div class="flex-col items-start  gap-4">
-                    <!-- Detalhes -->
-                    <div class="flex flex-col">
-                        <!-- Título -->
-                        <a href="/deteils/{{$event->id}}">
-                        <span style="font-size: 16px;" class="text-lg font-bold leading-tight text-gray-800">
-                            {{ $event->title }}
-                        </span>
-                        </a>
-                        <!-- Tipo -->
-                        <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->realized_at }} | {{ $event->event_type }}</span>
-                        <!-- Horários -->
-                        <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->start_at }} - {{ $event->end_at }}</span>
-                        <!-- Vagas e Interessados -->
-                        <div class="flex gap-4">
-                            <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->vacancies }} Vagas</span>
-                            <span style="font-size: 14px;" class="text-sm text-gray-600">{{ $event->total_participants }} Interessados</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="container">
+    @if ($events->isEmpty())
+        <div class="alert alert-danger text-center">Nenhum evento encontrado.</div>
+    @else
+    <div class="container d-flex flex-wrap justify-content-center gap-4" id="event-list">
+        @foreach ($events as $value)
+            @include('components.event-card', ['event' => $value])
         @endforeach
-        @endif
     </div>
+    @endif
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
-    // Filtro de eventos com JavaScript
-    const filterInput = document.querySelector('input[name="query"]');
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+        e.preventDefault(); 
 
-    filterInput.addEventListener('input', filterEvents);
+        const query = document.querySelector('[name="query"]').value;
+        const category = document.getElementById('category-filter').value;
+        const date = document.getElementById('date-filter').value;
+        const type = document.getElementById('type-filter').value;
 
-    function filterEvents() {
-        const query = filterInput.value.toLowerCase();
-        const eventCards = document.querySelectorAll('.flex.flex-row');
+        let url = `/search?query=${query}&category=${category}&date=${date}&type=${type}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const eventList = document.getElementById('event-list');
+                eventList.innerHTML = ''; 
 
-        eventCards.forEach(card => {
-            const title = card.querySelector('.text-lg').textContent.toLowerCase();
-
-            // Filtra pelo título
-            if (title.includes(query)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
+                if (data.events.length === 0) {
+                    eventList.innerHTML = '<div class="alert alert-danger text-center">Nenhum evento encontrado.</div>';
+                } else {
+                    data.events.forEach(event => {
+                        const eventCard = `
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <img src="${event.image}" class="card-img-top" alt="${event.title}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${event.title}</h5>
+                                        <p class="card-text">${event.description}</p>
+                                        <a href="/events.details/${event.id}" class="btn btn-primary">Ver Detalhes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        eventList.innerHTML += eventCard;
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+    });
 </script>
-
 @endsection

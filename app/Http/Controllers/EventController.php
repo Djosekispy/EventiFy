@@ -40,7 +40,7 @@ class EventController extends Controller
         ->select('events.*', 'categories.category_title', DB::raw('COUNT(participants.id) as total_participants'), 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
         ->groupBy('events.id', 'categories.category_title', 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
         ->get();
-     //dd($events);
+
         $events_online = DB::table('events')
         ->join('categories','categories.id','=','events.category_id')
         ->leftJoin('participants','participants.events_id','=','events.id')
@@ -125,8 +125,6 @@ class EventController extends Controller
             $event->user_id = auth()->id();
             $event->save();
             $eventId = $event->id;
-
-            // Salvar Ingressos
             foreach ($data['ticket_name'] as $key => $value) {
                 $ticket = new Ticket();
                 $ticket->ticket_title = $value;
@@ -134,8 +132,6 @@ class EventController extends Controller
                 $ticket->events_id = $eventId;
                 $ticket->save();
             }
-
-            // Salvar Sessões
             foreach ($data['session_date'] as $key => $value) {
                 $session = new Ticketsession();
                 $session->session_title = ($key + 1) . 'ª';
@@ -268,7 +264,7 @@ class EventController extends Controller
             $event->description = $validatedData['description'];
 
             $event->save();
-            return redirect()->back()->with('success', 'Evento atualizado com sucesso!');
+            return redirect()->to('/deteils/'.$id)->with('status', 'Evento atualizado com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Ocorreu um erro ao atualizar o evento.');
         }
@@ -390,77 +386,93 @@ class EventController extends Controller
         }
     }
     public function search(Request $request)
-    {
-        // Receber parâmetros de busca do nome e localização
-        $name = $request->input('query');
-        $location = $request->input('location');
-        $locations = Event::all()->unique('location');
+{
+    $name = $request->input('query');
+    $location = $request->input('location');
+    $category = $request->input('category');
+    $date = $request->input('date');
+    $type = $request->input('type');
 
-        // Construir a query com os filtros
-        $events = DB::table('events')
-            ->join('categories', 'categories.id', '=', 'events.category_id')
-            ->leftJoin('participants', 'participants.events_id', '=', 'events.id')
-            ->join('ticketsessions', 'ticketsessions.events_id', '=', 'events.id')
-            ->when($name, function ($query, $name) {
-                return $query->where('events.title', 'like', '%' . $name . '%');
-            })
-            ->when($location, function ($query, $location) {
-                return $query->where('events.location', 'like', '%' . $location . '%');
-            })
-            ->select(
-                'events.*',
-                'categories.category_title',
-                DB::raw('COUNT(participants.id) as total_participants'),
-                'ticketsessions.session_title',
-                'ticketsessions.realized_at',
-                'ticketsessions.start_at',
-                'ticketsessions.end_at'
-            )
-            ->groupBy(
-                'events.id',
-                'categories.category_title',
-                'ticketsessions.session_title',
-                'ticketsessions.realized_at',
-                'ticketsessions.start_at',
-                'ticketsessions.end_at'
-            )
-            ->get();
+    $locations = DB::table('events')->distinct()->pluck('location');
+    $categories = DB::table('categories')->distinct()->pluck('category_title');
+    $eventTypes = ['online', 'presencial']; 
+
+    $events = DB::table('events')
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('participants', 'participants.events_id', '=', 'events.id')
+        ->join('ticketsessions', 'ticketsessions.events_id', '=', 'events.id')
+        ->when($name, function ($query, $name) {
+            return $query->where('events.title', 'like', '%' . $name . '%');
+        })
+        ->when($location, function ($query, $location) {
+            return $query->where('events.location', 'like', '%' . $location . '%');
+        })
+        ->when($category, function ($query, $category) {
+            return $query->where('categories.category_title', 'like', '%' . $category . '%');
+        })
+        ->when($date, function ($query, $date) {
+            return $query->whereDate('ticketsessions.realized_at', '=', $date);
+        })
+        ->when($type, function ($query, $type) {
+            return $query->where('events.event_type', '=', $type);
+        })
+        ->select(
+            'events.*',
+            'categories.category_title',
+            DB::raw('COUNT(participants.id) as total_participants'),
+            'ticketsessions.session_title',
+            'ticketsessions.realized_at',
+            'ticketsessions.start_at',
+            'ticketsessions.end_at'
+        )
+        ->groupBy(
+            'events.id',
+            'categories.category_title',
+            'ticketsessions.session_title',
+            'ticketsessions.realized_at',
+            'ticketsessions.start_at',
+            'ticketsessions.end_at'
+        )
+        ->get();
+    return view('search.search', [
+        'events' => $events,
+        'locations' => $locations,
+        'categories' => $categories,
+        'eventTypes' => $eventTypes
+    ]);
+}
+
+public function searchByCategory($categoryId)
+{
+    $locations = Event::all()->unique('location');
+    $events = DB::table('events')
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('participants', 'participants.events_id', '=', 'events.id')
+        ->join('ticketsessions', 'ticketsessions.events_id', '=', 'events.id')
+        ->where('categories.id', $categoryId)
+        ->select(
+            'events.*',
+            'categories.category_title',
+            DB::raw('COUNT(participants.id) as total_participants'),
+            'ticketsessions.session_title',
+            'ticketsessions.realized_at',
+            'ticketsessions.start_at',
+            'ticketsessions.end_at'
+        )
+        ->groupBy(
+            'events.id',
+            'categories.category_title',
+            'ticketsessions.session_title',
+            'ticketsessions.realized_at',
+            'ticketsessions.start_at',
+            'ticketsessions.end_at'
+        )
+        ->get();
 
         return view('search.search', ['events' => $events, 'locations' => $locations]);
-    }
-    public function searchByCategory($categoryId)
-    {
-        // Construir a query com o filtro por categoria
-        $locations = Event::all()->unique('location');
-        $events = DB::table('events')
-            ->join('categories', 'categories.id', '=', 'events.category_id')
-            ->leftJoin('participants', 'participants.events_id', '=', 'events.id')
-            ->join('ticketsessions', 'ticketsessions.events_id', '=', 'events.id')
-            ->where('categories.id', $categoryId)
-            ->select(
-                'events.*',
-                'categories.category_title',
-                DB::raw('COUNT(participants.id) as total_participants'),
-                'ticketsessions.session_title',
-                'ticketsessions.realized_at',
-                'ticketsessions.start_at',
-                'ticketsessions.end_at'
-            )
-            ->groupBy(
-                'events.id',
-                'categories.category_title',
-                'ticketsessions.session_title',
-                'ticketsessions.realized_at',
-                'ticketsessions.start_at',
-                'ticketsessions.end_at'
-            )
-            ->get();
-
-            return view('search.search', ['events' => $events, 'locations' => $locations]);
-    }
+}
     public function searchByEventType($eventTypeId)
     {
-        // Construir a query com o filtro por tipo de evento
         $locations = Event::all()->unique('location');
 
         if($eventTypeId == 'all'){
@@ -523,119 +535,118 @@ class EventController extends Controller
 
     }
 
-public function editGeneral($id)
-{
-    try {
-        $event = Event::findOrFail($id);
-        $categories = Category::all();
-        return view('event.edit_general',  compact('event', 'categories'));
-    } catch (\Throwable $th) {
-        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
-    }
-}
-
-public function editCover($id)
-{
-    try {
-        $event = Event::findOrFail($id);
-        return view('event.edit_cover', compact('event'));
-    } catch (\Throwable $th) {
-        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
-    }
-}
-
-public function updateBanner(Request $request, $id)
+    public function editGeneral($id)
     {
-        $request->validate([
-            'event_banner' => 'required|image|mimes:jpeg,png|max:2048',
-        ]);
-
-        $event = Event::findOrFail($id);
-        if ($event->banner_path && Storage::exists($event->banner_path)) {
-            Storage::delete($event->banner_path);
+        try {
+            $event = Event::findOrFail($id);
+            $categories = Category::all();
+            return view('event.edit_general',  compact('event', 'categories'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
         }
-        $filePath = $request->file('event_banner')->store('uploads', 'public');
-        $event->banner_image = $filePath;
-        $event->save();
-        return redirect()
-            ->back()
-            ->with('success', 'Imagem do evento atualizada com sucesso!');
     }
 
-
-public function editSession($id)
-{
-    try {
-        $event = Event::findOrFail($id);
-        $sessions = Ticketsession::where('events_id', $id)->get();
-        return view('event.edit_session', compact('event', 'sessions'));
-    } catch (\Throwable $th) {
-        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
-    }
-}
-
-public function updateSessions(Request $request, $id)
-{
-    try {
-        $request->validate([
-            'session_id.*' => 'nullable|integer|exists:ticketsessions,id',
-            'session_date.*' => 'required|date',
-            'session_start_time.*' => 'required|date_format:H:i',
-            'session_end_time.*' => 'required|date_format:H:i|after:session_start_time.*',
-        ]);
-
-        $event = Event::findOrFail($id);
-        if ($request->has('removed_sessions')) {
-            TicketSession::whereIn('id', $request->removed_sessions)->delete();
+    public function editCover($id)
+    {
+        try {
+            $event = Event::findOrFail($id);
+            return view('event.edit_cover', compact('event'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
         }
+    }
 
-        foreach ($request->session_end_time as $index => $endTime) {
-            if (!preg_match('/^\d{2}:\d{2}$/', $endTime)) {
-                return redirect()->back()->with('error', 'Hora de término inválida no formato HH:MM');
+    public function updateBanner(Request $request, $id)
+        {
+            $request->validate([
+                'event_banner' => 'required|image|mimes:jpeg,png|max:2048',
+            ]);
+
+            $event = Event::findOrFail($id);
+            if ($event->banner_path && Storage::exists($event->banner_path)) {
+                Storage::delete($event->banner_path);
             }
+            $filePath = $request->file('event_banner')->store('uploads', 'public');
+            $event->banner_image = $filePath;
+            $event->save();
+            return redirect()
+                ->back()
+                ->with('success', 'Imagem do evento atualizada com sucesso!');
         }
-        
 
-        foreach ($request->session_date as $index => $date) {
-            $sessionId = $request->session_id[$index] ?? null;
 
-            $sessionData = [
-                'realized_at' => $date,
-                'start_at' => $request->session_start_time[$index],
-                'end_at' => $request->session_end_time[$index],
-            ];
-            if ($sessionId) {
-                $session = TicketSession::find($sessionId);
-                if ($session) {
-                    $session->update($sessionData);
+    public function editSession($id)
+    {
+        try {
+            $event = Event::findOrFail($id);
+            $sessions = Ticketsession::where('events_id', $id)->get();
+            return view('event.edit_session', compact('event', 'sessions'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+        }
+    }
+
+    public function updateSessions(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'session_id.*' => 'nullable|integer|exists:ticketsessions,id',
+                'session_date.*' => 'required|date',
+                'session_start_time.*' => 'required|date_format:H:i',
+                'session_end_time.*' => 'required|date_format:H:i|after:session_start_time.*',
+            ]);
+
+            $event = Event::findOrFail($id);
+            if ($request->has('removed_sessions')) {
+                TicketSession::whereIn('id', $request->removed_sessions)->delete();
+            }
+
+            foreach ($request->session_end_time as $index => $endTime) {
+                if (!preg_match('/^\d{2}:\d{2}$/', $endTime)) {
+                    return redirect()->back()->with('error', 'Hora de término inválida no formato HH:MM');
                 }
-            } else {
-                TicketSession::create([
-                    'events_id' => $event->id,
-                    ...$sessionData,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
             }
+            
+
+            foreach ($request->session_date as $index => $date) {
+                $sessionId = $request->session_id[$index] ?? null;
+
+                $sessionData = [
+                    'realized_at' => $date,
+                    'start_at' => $request->session_start_time[$index],
+                    'end_at' => $request->session_end_time[$index],
+                ];
+                if ($sessionId) {
+                    $session = TicketSession::find($sessionId);
+                    if ($session) {
+                        $session->update($sessionData);
+                    }
+                } else {
+                    TicketSession::create([
+                        'events_id' => $event->id,
+                        ...$sessionData,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
+            return redirect()
+                ->back()
+                ->with('success',  'Sessões atualizadas com sucesso!');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
         }
-
-        return redirect()
-            ->back()
-            ->with('success',  'Sessões atualizadas com sucesso!');
-    } catch (\Throwable $th) {
-        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
     }
-}
 
-
-public function editTicket($id)
-{
-    try {
-        $event = Event::findOrFail($id);
-        $tickets = Ticket::where('events_id', $id)->get();
-        return view('event.edit_ticket', compact('event', 'tickets'));
-    } catch (\Throwable $th) {
-        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+    public function editTicket($id)
+    {
+        try {
+            $event = Event::findOrFail($id);
+            $tickets = Ticket::where('events_id', $id)->get();
+            return view('event.edit_ticket', compact('event', 'tickets'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+        }
     }
-}
 }
