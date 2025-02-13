@@ -23,18 +23,21 @@
                 </div>
             @endif
             <div class="d-flex align-items-center mb-3">
-                <i class="fas fa-wrench fa-2x me-2 text-primary"></i>
+                <i class="fas fa-users fa-2x me-2 text-primary"></i> 
                 <span class="fw-bold fs-5 text-primary">{{$event['event'][0]->category_title}}</span>
             </div>
             <h3 class="fw-bold">{{$event['event'][0]->title}}</h3>
-            <p class="text-muted">Cada componente é escolhido para otimizar a potência e a eficiência do seu veículo, garantindo que você aproveite ao máximo cada curva.</p>
-            <p class="mb-1"><b>Localização:</b> <i>{{$event['event'][0]->location}}</i></p>
-            <p class="mb-1"><b>Vagas Disponíveis:</b> <i>{{$event['event'][0]->vacancies}}</i></p>
-            <p class="mb-3"><b>Interessados:</b> <i>{{ $participante->count() }}</i></p>
-
-            <h4 class="fw-bold mt-4">Informações de Pagamento</h4>
             <p class="text-muted">{{$event['event'][0]->payment_info}}</p>
 
+            <p class="mb-1">
+                <i class="fas fa-map-marker-alt"></i> <b>Localização:</b> <i>{{$event['event'][0]->location}}</i>
+            </p>
+            <p class="mb-1">
+                <i class="fas fa-users"></i> <b>Vagas Disponíveis:</b> <i>{{$event['event'][0]->vacancies}}</i>
+            </p>
+            <p class="mb-3">
+                <i class="fas fa-heart"></i> <b>Interessados:</b> <i>{{ $participante->count() }}</i>
+            </p>
             <div class="text-center mt-4">
                 @if($event['event'][0]->deleted_at === NULL)
                     @if(!$isParticipant && $event['event'][0]->user_id !== auth()->id())
@@ -128,7 +131,7 @@
 <!-- Menu de Compartilhamento -->
 <div id="menu-compartilhamento" class="position-fixed top-50 start-50 translate-middle bg-white p-4 rounded shadow" style="display: none; width: 400px;">
     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-        <h3 class="mb-0">{{$event['event'][0]->title}}</h3>
+        <h4 class="mb-0">{{$event['event'][0]->title}}</h4>
         <button class="btn btn-close" onclick="fecharMenuCompartilhamento()"></button>
     </div>
     
@@ -150,6 +153,14 @@
         <button class="btn btn-secondary" onclick="compartilharLinkedIn()">
             <i class="fab fa-linkedin"></i> LinkedIn
         </button>
+    </div>
+
+    <!-- Container para o QR Code -->
+    <div class="text-center mt-4">
+        <h5 class="mb-3">Ou escaneie o QR Code</h5>
+        <div class="d-flex justify-content-center align-items-center">
+            <div id="qrcode"></div>
+        </div>
     </div>
 </div>
 
@@ -259,6 +270,7 @@
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 <script>
     const carousel = document.getElementById("carousel");
     const prev = document.getElementById("prev");
@@ -347,6 +359,15 @@
     }
     function abrirMenuCompartilhamento() {
         document.getElementById('menu-compartilhamento').style.display = 'block';
+
+        const qrcodeContainer = document.getElementById('qrcode');
+    qrcodeContainer.innerHTML = ''; 
+    const url = `http://localhost:8000/details/{{$event['event'][0]->id}}`; 
+    new QRCode(qrcodeContainer, {
+        text: url,
+        width: 150,
+        height: 150,
+    });
     }
 
     function fecharMenuCompartilhamento() {

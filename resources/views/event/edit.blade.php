@@ -14,7 +14,7 @@
     <div class="card shadow-sm p-4 mx-auto" style="max-width: 800px;">
         <form action="/event/banner" method="post">
             @csrf
-            <h4 class="text-center fw-bold mb-4">Detalhes do Evento</h4>
+            <h4 class="text-center fw-bold mb-4">Cadastrar do Evento</h4>
 
             <!-- Tema do Evento -->
             <div class="mb-3">

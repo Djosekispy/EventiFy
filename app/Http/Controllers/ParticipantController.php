@@ -45,7 +45,7 @@ class ParticipantController extends Controller
         ]);
 
         $event = Event::find($request->events_id);
-
+        
         if ($event) {
             $eventCreator = User::find($event->user_id);
             $participant = User::find($request->users_id);
@@ -62,6 +62,8 @@ class ParticipantController extends Controller
                 info("Notificação enviada para o criador do evento sobre a nova inscrição.");
             }
         }
+        $event->vacancies = $event->vacancies - 1;
+        $event->save();
 
         return redirect()->route('participants.index')->with('status', 'Participante adicionado com sucesso!');
     }
