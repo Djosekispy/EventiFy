@@ -23,6 +23,15 @@
             </div>
         </div>
     </div>
+    @if ($event->user_id == Auth::id())
+    <div class="container text-center mb-2">
+        <a href="{{ route('event.listParticipants', $event->id) }}" class="btn btn-primary btn-sm me-3">
+            <i class="fas fa-users me-2"></i> Lista de participantes
+        </a>
+    </div>
+    @endif
+    
+
 </div>
 
 <x-event-modal :title="$event->title" :id="$event->id" :image="$event->banner_image" />

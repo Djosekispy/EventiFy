@@ -128,7 +128,6 @@
     </div>
 </div>
 
-<!-- Menu de Compartilhamento -->
 <div id="menu-compartilhamento" class="position-fixed top-50 start-50 translate-middle bg-white p-4 rounded shadow" style="display: none; width: 400px;">
     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
         <h4 class="mb-0">{{$event['event'][0]->title}}</h4>
@@ -155,7 +154,6 @@
         </button>
     </div>
 
-    <!-- Container para o QR Code -->
     <div class="text-center mt-4">
         <h5 class="mb-3">Ou escaneie o QR Code</h5>
         <div class="d-flex justify-content-center align-items-center">
@@ -193,7 +191,6 @@
     @endif
 </div>
 
- <!-- Modal de Confirmação de Exclusão -->
  <div class="modal fade" id="confirmDialog" tabindex="-1" aria-labelledby="confirmDialogLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

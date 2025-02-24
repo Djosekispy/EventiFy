@@ -26,7 +26,7 @@ Route::get('/events',function(){
 
 
 Route::post('/search',[EventController::class,'search']);
-Route::get('/deteils/{id}',[EventController::class, 'show']);
+Route::get('/deteils/{id}',[EventController::class, 'show'])->name('event.details');
 Route::post('/invite',[EventController::class,'sendEmail']);
 Route::get('/search/category/{categoryId}', [EventController::class, 'searchByCategory'])->name('search.category');
 Route::get('/search/event-type/{eventTypeId}', [EventController::class, 'searchByEventType'])->name('search.event-type');
@@ -82,6 +82,8 @@ Route::middleware([
     Route::post('/profile/update-photo', [UserController::class, 'updateProfileImage']);
 
     Route::get('/participate/{id}', [ParticipantController::class, 'show'])->name('participate');
+    Route::get('/event/{eventId}/participants', [ParticipantController::class, 'listParticipants'])->name('event.listParticipants');
+    Route::get('/event/{eventId}/export-pdf', [ParticipantController::class, 'exportParticipantsToPdf'])->name('event.exportParticipantsToPdf');
 
     Route::get('/profile',function(){
         return view('auth.profile');

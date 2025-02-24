@@ -17,6 +17,7 @@
     <div class="container d-flex flex-wrap justify-content-center gap-4 mt-6" id="event-list">
         @foreach ($events as $value)
             @include('components.event-card', ['event' => $value])
+           
         @endforeach
     </div>
 @else

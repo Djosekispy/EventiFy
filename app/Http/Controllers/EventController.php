@@ -39,6 +39,7 @@ class EventController extends Controller
         ->where('events.deleted_at','=',NULL)
         ->select('events.*', 'categories.category_title', DB::raw('COUNT(participants.id) as total_participants'), 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
         ->groupBy('events.id', 'categories.category_title', 'ticketsessions.session_title', 'ticketsessions.realized_at', 'ticketsessions.start_at', 'ticketsessions.end_at')
+        ->orderBy('events.id', 'desc') 
         ->get();
 
         $events_online = DB::table('events')

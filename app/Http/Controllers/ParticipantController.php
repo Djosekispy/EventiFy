@@ -8,6 +8,15 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+
 
 class ParticipantController extends Controller
 {
@@ -164,5 +173,60 @@ class ParticipantController extends Controller
     
         return redirect()->back()->with('status', 'Participante removido com sucesso!');
     }
+
+    public function listParticipants($eventId)
+{
+    try {
+        $participants = Participant::where('events_id', $eventId)
+            ->join('users', 'users.id', '=', 'participants.users_id')
+            ->select('users.name', 'users.email', 'participants.created_at')
+            ->get();
+        return view('event.participants', ['participants' => $participants, 'eventId' => $eventId]);
+    } catch (\Throwable $th) {
+        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+    }
+}
+
+public function exportParticipantsToPdf($eventId)
+{
+    try {
+        $event = Event::findOrFail($eventId);
+        $participants = Participant::where('events_id', $eventId)
+            ->join('users', 'users.id', '=', 'participants.users_id')
+            ->select('users.name', 'users.email', 'participants.created_at')
+            ->get();
+
+            $writer = new PngWriter();
+
+
+            $builder = new Builder(
+                writer: new PngWriter(),
+                writerOptions: [],
+                validateResult: false,
+                data: route('event.details', $eventId),
+                encoding: new Encoding('UTF-8'),
+                errorCorrectionLevel: ErrorCorrectionLevel::High,
+                size: 300,
+                margin: 10,
+                roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                logoPath: public_path('storage/'.$event->banner_image),
+                logoResizeToWidth: 50,
+                logoPunchoutBackground: true,
+                labelFont: new OpenSans(20),
+                labelAlignment: LabelAlignment::Center
+            );
+            
+
+            $qrCodeImage = $builder->build()->getDataUri(); 
+        $pdf = Pdf::loadView('event.participants_pdf', [
+            'participants' => $participants,
+            'event' => $event,
+            'qrCodeImage' => $qrCodeImage
+        ]);
+        return $pdf->download('participantes_evento_' . $eventId . '.pdf');
+    } catch (\Throwable $th) {
+        return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
+    }
+}
 
 }

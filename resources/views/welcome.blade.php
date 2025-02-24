@@ -16,19 +16,13 @@
         <form action="/search" method="POST" class="d-flex flex-wrap justify-content-center gap-3 p-4 rounded-4 shadow-lg bg-light">
             @csrf
             @method('POST')
-            
-            <!-- Campo de pesquisa -->
             <input type="text" name="query" class="form-control form-control-md w-50 border-0 shadow-sm rounded-3" placeholder="Pesquisar eventos..." value="{{ request()->query('query') }}">
-    
-            <!-- Filtro de Localização -->
             <select name="location" class="form-select form-select-md w-25 border-0 shadow-sm rounded-3">
                 <option value="">Selecione a Localização</option>
                 @foreach ($events as $value)
                     <option value="{{ $value->location }}" {{ request()->query('location') == $value->location ? 'selected' : '' }}>{{ $value->location }}</option>
                 @endforeach
             </select>
-    
-            <!-- Botão de envio -->
             <button type="submit" class="btn btn-primary btn-md w-20 rounded-3 shadow-sm">Buscar</button>
         </form>
     </div>
@@ -60,7 +54,7 @@
         </div>
         @if(count($events_online) > 0)
         <div class="col-md-6 col-12 bg-light p-4 rounded shadow-lg">
-            <div class="d-flex flex-wrap justify-content-center gap-3">
+            <div class="d-flex  gap-3">
                 @foreach ($events_online as $value)
                     @include('components.event-card', ['event' => $value])
                 @endforeach

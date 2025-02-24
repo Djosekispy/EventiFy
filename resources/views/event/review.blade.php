@@ -3,27 +3,18 @@
 @section('content')
 
 <div class="container my-5">
-    <!-- Título do Evento -->
     <h1 class="display-4 fw-bold text-center mb-4">{{ $event['event_theme'] }}</h1>
     <h2 class="h5 text-center text-muted mb-5">{{ $event['location'] }}</h2>
     <h3 class="h6 text-center text-muted mb-5">{{ $event['session_date'][0] }}</h3>
-
-    <!-- Barra de Progresso -->
     <div class="text-center mb-5">
         <img src="{{ asset('storage/progress3.png') }}" alt="Progresso" class="img-fluid" style="max-width: 800px;">
     </div>
-
-    <!-- Detalhes do Evento -->
     <div class="card shadow-lg mb-5">
-        <!-- Banner do Evento -->
         <div class="card-img-top overflow-hidden" style="height: 400px;">
             <img src="{{ url('storage/' . $event['event_banner']) }}" alt="Banner do Evento" class="img-fluid w-100 h-100 object-fit-cover">
         </div>
-
-        <!-- Corpo do Card -->
         <div class="card-body">
             <div class="row">
-                <!-- Informações do Evento -->
                 <div class="col-md-8">
                     <h1 class="h2 fw-bold mb-3">{{ $event['event_theme'] }}</h1>
                     <p class="text-muted"><i>Sessões</i></p>
@@ -56,16 +47,12 @@
                         </ul>
                     @endif
                 </div>
-
-                <!-- Botão de Ação -->
                 <div class="col-md-4 text-center">
                     <button class="btn btn-warning btn-lg w-100 mb-3" style="background-color: #FFE047; color: #2B293D;">
                         <span>-</span>
                     </button>
                 </div>
             </div>
-
-            <!-- Descrição do Evento -->
             <div class="mt-4">
                 <h2 class="h4 fw-bold mb-3">Descrição</h2>
                 <p class="text-justify text-muted">{{ $event['additional_info'] }}</p>
@@ -75,8 +62,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Botões de Ação -->
     <div class="d-flex justify-content-end gap-3">
         <form action="/event/save" method="POST">
             @csrf
