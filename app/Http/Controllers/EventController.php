@@ -570,9 +570,7 @@ public function searchByCategory($categoryId)
             $filePath = $request->file('event_banner')->store('uploads', 'public');
             $event->banner_image = $filePath;
             $event->save();
-            return redirect()
-                ->back()
-                ->with('success', 'Imagem do evento atualizada com sucesso!');
+            return redirect()->to('/deteils/'.$id)->with('status', 'Imagem do evento atualizada com sucesso!');
         }
 
 
@@ -631,10 +629,7 @@ public function searchByCategory($categoryId)
                     ]);
                 }
             }
-
-            return redirect()
-                ->back()
-                ->with('success',  'Sessões atualizadas com sucesso!');
+                return redirect()->to('/deteils/'.$id)->with('status', 'Sessões atualizadas com sucesso!');
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Algo Inesperado: ' . $th->getMessage());
         }
